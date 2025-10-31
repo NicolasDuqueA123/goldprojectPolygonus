@@ -84,7 +84,7 @@ with tab1:
     
     with col2:
         # Cargar una imagen (asegúrate de subir una imagen a tu repo y cambiar el nombre)
-        # st.image("tu_imagen_de_oro.jpg", caption="El oro como activo financiero")
+        st.image("gold.png", caption="El oro como activo financiero")
         st.info("Asegúrate de añadir una imagen de oro a tu repositorio y descomentar la línea de st.image.")
 
 
@@ -102,7 +102,7 @@ with tab2:
     metrics_data = {
         'Modelo': ['Regresión Lineal*', 'CNN 1D', 'ARIMA', 'Prophet*', 'Híbrido (P+CNN)*'],
         'Métrica Principal': ['R²: 0.7316', 'R²: 0.9311', 'R²: -0.6166', 'R²: 0.9942', 'R²: 0.9372', 'Accuracy: (Ver gráfica)'],
-        'Nota': ['Sobreajustado', 'Realista', 'Requiere ajuste', 'Sobreajustado', 'Sobreajustado', 'Predice Dirección']
+        'Nota': ['Sobreajustado', 'Realista', 'Requiere ajuste', 'Sobreajustado', 'Sobreajustado']
     }
     st.dataframe(pd.DataFrame(metrics_data), use_container_width=True)
     st.warning("*Nota: Las métricas de Reg. Lineal, Prophet e Híbrido en el notebook original estaban sobreajustadas (evaluadas en datos de entrenamiento).")
