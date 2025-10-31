@@ -99,33 +99,16 @@ with tab1:
         """)
     
     with col2:
-        st.info("Añade una imagen relevante a tu repositorio y usa st.image('nombre_archivo.jpg') aquí.")
-
-
-# --- PESTAÑA 2: GRÁFICAS Y ANÁLISIS ---
-with tab2:
-    st.header("Análisis Gráfico de los Modelos")
+        st.header("Análisis Gráfico de los Modelos")
     
     # Gráfica de precios históricos
     st.subheader("Precio Histórico del Oro (XAU)")
     fig_hist = px.line(df, x='Date', y='Close', title='Precio de Cierre (Close) - Serie temporal')
     st.plotly_chart(fig_hist, use_container_width=True)
-    
-    # Métricas (CORREGIDO: 5 elementos en cada lista)
-    st.subheader("Métricas de Rendimiento (Evaluación del Notebook)")
-    metrics_data = {
-    'Modelo': ['Regresión Lineal', 'CNN 1D', 'ARIMA', 'Prophet', 'Híbrido (P+CNN)'], 
-    'Métrica Principal': ['R²: 0.7316', 'R²: 0.9311', 'R²: -0.6166', 'R²: 0.9942', 'R²: 0.9372'], 
-    'Nota': ['Sobreajustado', 'Realista', 'Requiere ajuste', 'Sobreajustado', 'Sobreajustado'] 
-    }
-    
-    # La línea 107 que daba error ahora funcionará
-    st.dataframe(pd.DataFrame(metrics_data), use_container_width=True)
-    st.warning("*Nota: Las métricas marcadas con '*' estaban sobreajustadas (evaluadas en datos de entrenamiento) en el notebook original. La métrica R² de la CNN es la más confiable.")
 
 
-# --- PESTAÑA 3: PREDICCIÓN EN VIVO ---
-with tab3:
+# --- PESTAÑA 2: PREDICCIÓN EN VIVO ---
+with tab2:
     st.header("Generador de Pronóstico")
     st.write("Selecciona un modelo y la cantidad de días que deseas proyectar.")
 
