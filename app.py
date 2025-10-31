@@ -43,7 +43,7 @@ def load_all_models():
     models['cnn_scaler'] = joblib.load('cnn_scaler.joblib')
 
     # Modelo Logístico
-    models['logistic'] = joblib.load('logistic_model.joblib')
+    #models['logistic'] = joblib.load('logistic_model.joblib')
     
     return models
 
@@ -100,7 +100,7 @@ with tab2:
     # Métricas (Copiadas de tu notebook)
     st.subheader("Métricas de Rendimiento (Evaluación del Notebook)")
     metrics_data = {
-        'Modelo': ['Regresión Lineal*', 'CNN 1D', 'ARIMA', 'Prophet*', 'Híbrido (P+CNN)*', 'Regresión Logística'],
+        'Modelo': ['Regresión Lineal*', 'CNN 1D', 'ARIMA', 'Prophet*', 'Híbrido (P+CNN)*'],
         'Métrica Principal': ['R²: 0.7316', 'R²: 0.9311', 'R²: -0.6166', 'R²: 0.9942', 'R²: 0.9372', 'Accuracy: (Ver gráfica)'],
         'Nota': ['Sobreajustado', 'Realista', 'Requiere ajuste', 'Sobreajustado', 'Sobreajustado', 'Predice Dirección']
     }
@@ -108,8 +108,8 @@ with tab2:
     st.warning("*Nota: Las métricas de Reg. Lineal, Prophet e Híbrido en el notebook original estaban sobreajustadas (evaluadas en datos de entrenamiento).")
 
     # Gráfica del Modelo Logístico (Matriz de Confusión)
-    st.subheader("Análisis del Modelo Logístico (Predicción de Dirección)")
-    st.write("Este modelo predice si el precio 'Subirá' (1) o 'Bajará/Se mantendrá' (0).")
+    #st.subheader("Análisis del Modelo Logístico (Predicción de Dirección)")
+    #st.write("Este modelo predice si el precio 'Subirá' (1) o 'Bajará/Se mantendrá' (0).")
     
     # Recrear los datos para la matriz de confusión (código de tu notebook)
     log_data = df[['Date', 'Close']].copy()
