@@ -4,52 +4,67 @@ import numpy as np
 import joblib
 import plotly.express as px
 import matplotlib.pyplot as plt
-import seaborn as sns
 from prophet import Prophet
 from prophet.serialize import model_from_json
-from statsmodels.tsa.arima.model import ARIMAResults
+# La línea de abajo requiere que hayas guardado el objeto ARIMA con joblib/pickle
+# Si usaste .save() en statsmodels, podrías necesitar from statsmodels.tsa.arima.model import ARIMAResults
+# Para este código, asumiremos que se guardó con joblib/pickle como un objeto "fit" (como en el notebook).
 from tensorflow.keras.models import load_model
-from sklearn.metrics import classification_report, confusion_matrix
 
 # --- 1. CONFIGURACIÓN Y CARGA DE DATOS ---
 
-# Configura la página (esto debe ser lo primero)
+# Configura la página
 st.set_page_config(layout="wide", page_title="Predicción Precio del Oro")
 
-# Cargar los datos y modelos (con caché para que solo se carguen una vez)
+# Cargar los datos (con caché para que solo se carguen una vez)
 @st.cache_data
 def load_data():
-    df = pd.read_csv('XAU_1d_data_V2.csv', sep=None, engine='python')
-    df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
-    df.columns = df.columns.str.strip()
-    return df
+    # Asegúrate de que este nombre de archivo coincida con tu CSV en GitHub
+    try:
+        df = pd.read_csv('XAU_1d_data_V2.csv', sep=None, engine='python')
+        df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+        df.columns = df.columns.str.strip()
+        # Limpiar filas con NaN en el precio
+        df.dropna(subset=['Close'], inplace=True) 
+        df.sort_values('Date', inplace=True)
+        return df
+    except FileNotFoundError:
+        st.error("Error: Archivo 'XAU_1d_data_V2.csv' no encontrado. Asegúrate de que esté en la raíz de tu repositorio de GitHub.")
+        return pd.DataFrame()
 
+# Cargar los modelos (con caché para que solo se carguen una vez)
 @st.cache_resource
 def load_all_models():
     models = {}
     
-    # Modelo Lineal
-    models['linear'] = joblib.load('linear_model.joblib')
-    
-    # Modelo ARIMA
-    models['arima'] = joblib.load('arima_model.pkl')
-    
-    # Modelo Prophet
-    with open('prophet_model.json', 'r') as fin:
-        models['prophet'] = model_from_json(fin.read())
+    # Intenta cargar cada modelo; si alguno falta, muestra un error específico.
+    try:
+        models['linear'] = joblib.load('linear_model.joblib')
+        models['arima'] = joblib.load('arima_model.pkl')
         
-    # Modelo CNN y su scaler
-    models['cnn'] = load_model('cnn_model.keras')
-    models['cnn_scaler'] = joblib.load('cnn_scaler.joblib')
-
-    # Modelo Logístico
-    #models['logistic'] = joblib.load('logistic_model.joblib')
+        with open('prophet_model.json', 'r') as fin:
+            models['prophet'] = model_from_json(fin.read())
+            
+        models['cnn'] = load_model('cnn_model.keras')
+        models['cnn_scaler'] = joblib.load('cnn_scaler.joblib')
+        
+    except FileNotFoundError as e:
+        st.error(f"Error al cargar un archivo de modelo: {e}. Asegúrate de que todos los archivos (.joblib, .pkl, .json, .keras) estén en la raíz del repositorio.")
+        return None
+    except Exception as e:
+        st.error(f"Error inesperado al cargar modelos: {e}")
+        return None
     
     return models
 
 # Cargar todo al inicio
 df = load_data()
+if df.empty:
+    st.stop()
+    
 models = load_all_models()
+if models is None:
+    st.stop()
 
 
 # --- 2. INTERFAZ DE PESTAÑAS ---
@@ -75,6 +90,7 @@ with tab1:
         **Modelos Implementados:**
         * Regresión Lineal Simple
         * Red Neuronal Convolucional (CNN 1D)
+        * ARIMA (Autoregressive Integrated Moving Average)
         * Prophet (de Meta)
         * Modelo Híbrido (Prophet + CNN)
         
@@ -83,9 +99,7 @@ with tab1:
         """)
     
     with col2:
-        # Cargar una imagen (asegúrate de subir una imagen a tu repo y cambiar el nombre)
-        st.image("gold.png", caption="El oro como activo financiero")
-        st.info("El oro es considerado un activo refugio que preserva valor en el tiempo y se adelanta a crisis inflacionarias.")
+        st.info("Añade una imagen relevante a tu repositorio y usa st.image('nombre_archivo.jpg') aquí.")
 
 
 # --- PESTAÑA 2: GRÁFICAS Y ANÁLISIS ---
@@ -97,71 +111,22 @@ with tab2:
     fig_hist = px.line(df, x='Date', y='Close', title='Precio de Cierre (Close) - Serie temporal')
     st.plotly_chart(fig_hist, use_container_width=True)
     
-    # Métricas (Copiadas de tu notebook)
-    # Reemplaza todo el bloque metrics_data con ESTO:
-
+    # Métricas (CORREGIDO: 5 elementos en cada lista)
     st.subheader("Métricas de Rendimiento (Evaluación del Notebook)")
     metrics_data = {
-        'Modelo': [
-            'Regresión Lineal*', 
-            'CNN 1D', 
-            'ARIMA', 
-            'Prophet*', 
-            'Híbrido (P+CNN)*'
-        ],
-        'Métrica Principal': [
-            'R²: 0.7316', 
-            'R²: 0.9311', 
-            'R²: -0.6166', 
-            'R²: 0.9942', 
-            'R²: 0.9372'
-        ],
-        'Nota': [
-            'Sobreajustado', 
-            'Realista', 
-            'Requiere ajuste', 
-            'Sobreajustado', 
-            'Sobreajustado'
-        ]
+        # Lista 1: Modelos (5 elementos)
+        'Modelo': ['Regresión Lineal*', 'CNN 1D', 'ARIMA', 'Prophet*', 'Híbrido (P+CNN)*'], 
+        
+        # Lista 2: Métricas (5 elementos)
+        'Métrica Principal': ['R²: 0.7316', 'R²: 0.9311', 'R²: -0.6166', 'R²: 0.9942', 'R²: 0.9372'], 
+        
+        # Lista 3: Notas (5 elementos)
+        'Nota': ['Sobreajustado', 'Realista', 'Requiere ajuste', 'Sobreajustado', 'Sobreajustado'] 
     }
-
+    
+    # La línea 107 que daba error ahora funcionará
     st.dataframe(pd.DataFrame(metrics_data), use_container_width=True)
-    st.warning("*Nota: Las métricas de Reg. Lineal, Prophet e Híbrido en el notebook original estaban sobreajustadas (evaluadas en datos de entrenamiento).")
-
-
-
-    # Gráfica del Modelo Logístico (Matriz de Confusión)
-    #st.subheader("Análisis del Modelo Logístico (Predicción de Dirección)")
-    #st.write("Este modelo predice si el precio 'Subirá' (1) o 'Bajará/Se mantendrá' (0).")
-    
-    # Recrear los datos para la matriz de confusión (código de tu notebook)
-    log_data = df[['Date', 'Close']].copy()
-    log_data['price_diff'] = log_data['Close'].diff()
-    log_data['y'] = (log_data['price_diff'] > 0).astype(int)
-    n_lags = 5
-    for i in range(1, n_lags + 1):
-        log_data[f'lag_diff_{i}'] = log_data['price_diff'].shift(i)
-    log_data = log_data.dropna()
-    
-    X_log = log_data[[f'lag_diff_{i}' for i in range(1, n_lags + 1)]]
-    y_log = log_data['y']
-    
-    # Escalar
-    scaler_log = joblib.load('cnn_scaler.joblib') # Reutilizamos el scaler, aunque lo ideal sería uno propio
-    X_log_scaled = scaler_log.transform(X_log) # Asumiendo que el scaler logístico se guardó como cnn_scaler
-    
-    # Predecir sobre todos los datos (para la gráfica de tu notebook)
-    y_pred_log = models['logistic'].predict(X_log_scaled)
-    cm = confusion_matrix(y_log, y_pred_log)
-    
-    fig_cm = plt.figure(figsize=(8, 6))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
-                xticklabels=['Pred. Baja/Mantiene', 'Pred. Sube'],
-                yticklabels=['Real Baja/Mantiene', 'Real Sube'])
-    plt.title('Matriz de Confusión del Modelo Logístico')
-    plt.ylabel('Valor Real')
-    plt.xlabel('Valor Predicho')
-    st.pyplot(fig_cm)
+    st.warning("*Nota: Las métricas marcadas con '*' estaban sobreajustadas (evaluadas en datos de entrenamiento) en el notebook original. La métrica R² de la CNN es la más confiable.")
 
 
 # --- PESTAÑA 3: PREDICCIÓN EN VIVO ---
@@ -178,91 +143,86 @@ with tab3:
             # Obtener el último precio conocido
             last_price = df['Close'].iloc[-1]
             last_date = df['Date'].iloc[-1]
-            
             pred_value = 0
             
+            # Crear un nuevo índice de fechas para el pronóstico
+            future_dates = [last_date + pd.Timedelta(days=i) for i in range(1, days_to_forecast + 1)]
+            
+            # --- Lógica de predicción ---
+            
             if model_choice == 'Prophet':
-                # Hacer el dataframe futuro
                 future_df = models['prophet'].make_future_dataframe(periods=days_to_forecast)
-                # NOTA: Si tu modelo Prophet usa regresores (ma_20, etc.), esta parte fallará.
-                # Para un pronóstico real, necesitarías predecir los regresores también.
-                # Por simplicidad, asumimos que el modelo guardado no los *requiere* para predecir.
                 forecast = models['prophet'].predict(future_df)
                 pred_value = forecast.iloc[-1]['yhat']
                 
-                # Graficar
                 fig = models['prophet'].plot(forecast)
-                ax = fig.gca()
+                fig.gca().axhline(y=last_price, color='red', linestyle='--', lw=2, label=f'Último Precio: ${last_price:.2f}')
+                st.pyplot(fig)
+            
+            elif model_choice == 'ARIMA':
+                # Asumiendo que arima_model.pkl es el objeto .fit() de statsmodels
+                forecast_series = models['arima'].predict(start=len(df), end=len(df) + days_to_forecast - 1)
+                forecast = pd.Series(forecast_series.values, index=future_dates)
+                pred_value = forecast.iloc[-1]
+                
+                fig, ax = plt.subplots(figsize=(10, 6))
+                ax.plot(df['Date'].iloc[-200:], df['Close'].iloc[-200:], label='Datos Históricos')
+                ax.plot(future_dates, forecast.values, label='Pronóstico ARIMA', linestyle='--')
                 ax.axhline(y=last_price, color='red', linestyle='--', lw=2, label=f'Último Precio: ${last_price:.2f}')
                 ax.legend()
                 st.pyplot(fig)
             
-            elif model_choice == 'ARIMA':
-                forecast = models['arima'].forecast(steps=days_to_forecast)
-                pred_value = forecast.iloc[-1]
-                
-                # Graficar
-                fig = plt.figure(figsize=(10, 6))
-                plt.plot(df['Date'].iloc[-200:], df['Close'].iloc[-200:], label='Datos Históricos')
-                plt.plot(forecast, label='Pronóstico ARIMA', linestyle='--')
-                plt.axhline(y=last_price, color='red', linestyle='--', lw=2, label=f'Último Precio: ${last_price:.2f}')
-                plt.legend()
-                st.pyplot(fig)
-            
             elif model_choice == 'Regresión Lineal':
-                # Crear fechas futuras y convertirlas a ordinal
                 last_date_ordinal = df['Date'].map(pd.Timestamp.toordinal).iloc[-1]
                 future_dates_ordinal = np.array([last_date_ordinal + i for i in range(1, days_to_forecast + 1)]).reshape(-1, 1)
                 
                 forecast_values = models['linear'].predict(future_dates_ordinal)
                 pred_value = forecast_values[-1]
                 
-                # Graficar
-                future_dates = [last_date + pd.Timedelta(days=i) for i in range(1, days_to_forecast + 1)]
-                fig = plt.figure(figsize=(10, 6))
-                plt.plot(df['Date'].iloc[-200:], df['Close'].iloc[-200:], label='Datos Históricos')
-                plt.plot(future_dates, forecast_values, label='Pronóstico Lineal', linestyle='--')
-                plt.axhline(y=last_price, color='red', linestyle='--', lw=2, label=f'Último Precio: ${last_price:.2f}')
-                plt.legend()
+                fig, ax = plt.subplots(figsize=(10, 6))
+                ax.plot(df['Date'].iloc[-200:], df['Close'].iloc[-200:], label='Datos Históricos')
+                ax.plot(future_dates, forecast_values, label='Pronóstico Lineal', linestyle='--')
+                ax.axhline(y=last_price, color='red', linestyle='--', lw=2, label=f'Último Precio: ${last_price:.2f}')
+                ax.legend()
                 st.pyplot(fig)
 
             elif model_choice == 'CNN':
-                # La CNN necesita la última secuencia de datos para predecir
-                LOOKBACK = 30 # (El mismo LOOKBACK que usaste en el notebook)
+                # La CNN usa una ventana de tiempo (LOOKBACK), asumimos 30 días
+                LOOKBACK = 30 
                 scaler = models['cnn_scaler']
                 model_cnn = models['cnn']
                 
-                # Obtener los últimos 30 días y escalarlos
+                # Obtener la última secuencia de datos. Manejo de error si los datos no son suficientes
+                if len(df) < LOOKBACK:
+                    st.error(f"Datos insuficientes. Se necesitan {LOOKBACK} días de datos históricos para la CNN.")
+                    st.stop()
+                    
                 last_sequence_raw = df['Close'].iloc[-LOOKBACK:].values.reshape(-1, 1)
                 last_sequence_scaled = scaler.transform(last_sequence_raw)
                 
-                # La CNN espera la forma (1, 30, 1)
                 current_batch = last_sequence_scaled.reshape((1, LOOKBACK, 1))
-                
                 future_predictions_scaled = []
                 
-                # Predecir día por día, alimentando el modelo con su propia predicción
+                # Walk-forward prediction
                 for i in range(days_to_forecast):
-                    next_pred_scaled = model_cnn.predict(current_batch)[0]
+                    next_pred_scaled = model_cnn.predict(current_batch, verbose=0)[0]
                     future_predictions_scaled.append(next_pred_scaled)
-                    # Actualizar el 'current_batch' para la siguiente predicción
+                    # Mover la ventana de tiempo para incluir la nueva predicción
                     current_batch = np.append(current_batch[:, 1:, :], [[next_pred_scaled]], axis=1)
                 
-                # Des-escalar los resultados
+                # Des-escalar
                 forecast_values = scaler.inverse_transform(future_predictions_scaled)
                 pred_value = forecast_values[-1][0]
                 
-                # Graficar
-                future_dates = [last_date + pd.Timedelta(days=i) for i in range(1, days_to_forecast + 1)]
-                fig = plt.figure(figsize=(10, 6))
-                plt.plot(df['Date'].iloc[-200:], df['Close'].iloc[-200:], label='Datos Históricos')
-                plt.plot(future_dates, forecast_values, label='Pronóstico CNN', linestyle='--')
-                plt.axhline(y=last_price, color='red', linestyle='--', lw=2, label=f'Último Precio: ${last_price:.2f}')
-                plt.legend()
+                fig, ax = plt.subplots(figsize=(10, 6))
+                ax.plot(df['Date'].iloc[-200:], df['Close'].iloc[-200:], label='Datos Históricos')
+                ax.plot(future_dates, forecast_values, label='Pronóstico CNN', linestyle='--')
+                ax.axhline(y=last_price, color='red', linestyle='--', lw=2, label=f'Último Precio: ${last_price:.2f}')
+                ax.legend()
                 st.pyplot(fig)
 
             # --- Mostrar la predicción final ---
             st.subheader(f"Predicción de {model_choice} a {days_to_forecast} días:")
-            st.metric(label=f"Precio estimado del último día", 
+            st.metric(label=f"Precio estimado del día {days_to_forecast} ({future_dates[-1].strftime('%Y-%m-%d')})", 
                       value=f"${pred_value:,.2f}",
                       delta=f"${pred_value - last_price:,.2f} vs último precio")
