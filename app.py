@@ -82,7 +82,7 @@ with tab1:
     with col1:
         st.write("""
         Esta es una aplicación web interactiva construida con Streamlit para presentar 
-        un proyecto de pronóstico del precio del oro (XAU/USD). 
+        un proyecto de pronóstico del precio del oro (XAU/USD) creada por Nicolás Duque Aguirre. 
         
         El objetivo es implementar, comparar y visualizar el rendimiento de 
         diferentes modelos de series temporales y machine learning.
@@ -92,11 +92,9 @@ with tab1:
         * Red Neuronal Convolucional (CNN 1D)
         * ARIMA (Autoregressive Integrated Moving Average)
         * Prophet (de Meta)
-        * Modelo Híbrido (Prophet + CNN)
         
-        La siguiente tabla y gráfica resumen el rendimiento de estos modelos.
         """)
-        st.info("Añade una imagen relevante a tu repositorio y usa st.image('nombre_archivo.jpg') aquí.")
+        st.image('gold.png')
     
     # COLUMNA 2: Gráfica y Tabla de Métricas (Contenido movido y CORREGIDO)
     with col2:
