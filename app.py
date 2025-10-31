@@ -114,14 +114,9 @@ with tab2:
     # Métricas (CORREGIDO: 5 elementos en cada lista)
     st.subheader("Métricas de Rendimiento (Evaluación del Notebook)")
     metrics_data = {
-        # Lista 1: Modelos (5 elementos)
-        'Modelo': ['Regresión Lineal*', 'CNN 1D', 'ARIMA', 'Prophet*', 'Híbrido (P+CNN)*'], 
-        
-        # Lista 2: Métricas (5 elementos)
-        'Métrica Principal': ['R²: 0.7316', 'R²: 0.9311', 'R²: -0.6166', 'R²: 0.9942', 'R²: 0.9372'], 
-        
-        # Lista 3: Notas (5 elementos)
-        'Nota': ['Sobreajustado', 'Realista', 'Requiere ajuste', 'Sobreajustado', 'Sobreajustado'] 
+    'Modelo': ['Regresión Lineal', 'CNN 1D', 'ARIMA', 'Prophet', 'Híbrido (P+CNN)'], 
+    'Métrica Principal': ['R²: 0.7316', 'R²: 0.9311', 'R²: -0.6166', 'R²: 0.9942', 'R²: 0.9372'], 
+    'Nota': ['Sobreajustado', 'Realista', 'Requiere ajuste', 'Sobreajustado', 'Sobreajustado'] 
     }
     
     # La línea 107 que daba error ahora funcionará
