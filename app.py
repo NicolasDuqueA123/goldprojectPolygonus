@@ -6,9 +6,7 @@ import plotly.express as px
 import matplotlib.pyplot as plt
 from prophet import Prophet
 from prophet.serialize import model_from_json
-# La línea de abajo requiere que hayas guardado el objeto ARIMA con joblib/pickle
-# Si usaste .save() en statsmodels, podrías necesitar from statsmodels.tsa.arima.model import ARIMAResults
-# Para este código, asumiremos que se guardó con joblib/pickle como un objeto "fit" (como en el notebook).
+# Para este código, asumiremos que se guardó el modelo ARIMA con joblib/pickle como un objeto "fit".
 from tensorflow.keras.models import load_model
 
 # --- 1. CONFIGURACIÓN Y CARGA DE DATOS ---
@@ -71,14 +69,16 @@ if models is None:
 
 st.title("📈 Proyecto de Pronóstico del Precio del Oro")
 
-tab1, tab2 = st.tabs(["Introducción y análisis", "Hacer Predicción"])
+# Definición de las 2 pestañas
+tab1, tab2 = st.tabs(["Introducción y Análisis", "Hacer Predicción"])
 
 
-# --- PESTAÑA 1: INTRODUCCIÓN ---
+# --- PESTAÑA 1: INTRODUCCIÓN Y ANÁLISIS (Nueva estructura) ---
 with tab1:
-    st.header("Bienvenido al Proyecto")
+    st.header("Análisis de Modelos y Datos Históricos")
     col1, col2 = st.columns(2)
     
+    # COLUMNA 1: Introducción y Modelos
     with col1:
         st.write("""
         Esta es una aplicación web interactiva construida con Streamlit para presentar 
@@ -94,20 +94,33 @@ with tab1:
         * Prophet (de Meta)
         * Modelo Híbrido (Prophet + CNN)
         
-        Navega a la pestaña **"Análisis de Modelos"** para ver sus gráficas y métricas,
-        o ve a **"Hacer Predicción"** para probar los modelos en vivo.
+        La siguiente tabla y gráfica resumen el rendimiento de estos modelos.
         """)
+        st.info("Añade una imagen relevante a tu repositorio y usa st.image('nombre_archivo.jpg') aquí.")
     
+    # COLUMNA 2: Gráfica y Tabla de Métricas (Contenido movido y CORREGIDO)
     with col2:
-        st.header("Análisis Gráfico de los Modelos")
-    
         # Gráfica de precios históricos
         st.subheader("Precio Histórico del Oro (XAU)")
         fig_hist = px.line(df, x='Date', y='Close', title='Precio de Cierre (Close) - Serie temporal')
         st.plotly_chart(fig_hist, use_container_width=True)
 
+        # Tabla de Métricas (AÑADIDA AQUÍ Y REVISADA)
+        st.subheader("Métricas de Rendimiento (Evaluación del Notebook)")
+        metrics_data = {
+            # 5 elementos
+            'Modelo': ['Regresión Lineal*', 'CNN 1D', 'ARIMA', 'Prophet*', 'Híbrido (P+CNN)*'], 
+            # 5 elementos
+            'Métrica Principal': ['R²: 0.7316', 'R²: 0.9311', 'R²: -0.6166', 'R²: 0.9942', 'R²: 0.9372'], 
+            # 5 elementos
+            'Nota': ['Sobreajustado', 'Realista', 'Requiere ajuste', 'Sobreajustado', 'Sobreajustado'] 
+        }
+        
+        st.dataframe(pd.DataFrame(metrics_data), use_container_width=True)
+        st.warning("*Nota: Las métricas marcadas con '*' estaban sobreajustadas (evaluadas en datos de entrenamiento) en el notebook original. La métrica R² de la CNN es la más confiable.")
 
-# --- PESTAÑA 2: PREDICCIÓN EN VIVO ---
+
+# --- PESTAÑA 2: PREDICCIÓN EN VIVO (Antigua tab3) ---
 with tab2:
     st.header("Generador de Pronóstico")
     st.write("Selecciona un modelo y la cantidad de días que deseas proyectar.")
