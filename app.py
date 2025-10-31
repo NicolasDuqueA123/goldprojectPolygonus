@@ -71,7 +71,7 @@ if models is None:
 
 st.title("📈 Proyecto de Pronóstico del Precio del Oro")
 
-tab1, tab2, tab3 = st.tabs(["Introducción", "Análisis de Modelos", "Hacer Predicción"])
+tab1, tab2 = st.tabs(["Introducción y análisis", "Hacer Predicción"])
 
 
 # --- PESTAÑA 1: INTRODUCCIÓN ---
@@ -101,10 +101,10 @@ with tab1:
     with col2:
         st.header("Análisis Gráfico de los Modelos")
     
-    # Gráfica de precios históricos
-    st.subheader("Precio Histórico del Oro (XAU)")
-    fig_hist = px.line(df, x='Date', y='Close', title='Precio de Cierre (Close) - Serie temporal')
-    st.plotly_chart(fig_hist, use_container_width=True)
+        # Gráfica de precios históricos
+        st.subheader("Precio Histórico del Oro (XAU)")
+        fig_hist = px.line(df, x='Date', y='Close', title='Precio de Cierre (Close) - Serie temporal')
+        st.plotly_chart(fig_hist, use_container_width=True)
 
 
 # --- PESTAÑA 2: PREDICCIÓN EN VIVO ---
