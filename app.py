@@ -98,19 +98,33 @@ with tab2:
     st.plotly_chart(fig_hist, use_container_width=True)
     
     # Métricas (Copiadas de tu notebook)
+    # Reemplaza todo el bloque metrics_data con ESTO:
 
-    # Métricas (Asegúrate de que todas las listas tengan la misma longitud)
     st.subheader("Métricas de Rendimiento (Evaluación del Notebook)")
     metrics_data = {
-        # Lista 1: 5 Elementos
-        'Modelo': ['Regresión Lineal*', 'CNN 1D', 'ARIMA', 'Prophet*', 'Híbrido (P+CNN)*'], 
-        
-        # Lista 2: 5 Elementos
-        'Métrica Principal': ['R²: 0.7316', 'R²: 0.9311', 'R²: -0.6166', 'R²: 0.9942', 'R²: 0.9372'], 
-        
-        # Lista 3: 5 Elementos
-        'Nota': ['Sobreajustado', 'Realista', 'Requiere ajuste', 'Sobreajustado', 'Sobreajustado'] 
+        'Modelo': [
+            'Regresión Lineal*', 
+            'CNN 1D', 
+            'ARIMA', 
+            'Prophet*', 
+            'Híbrido (P+CNN)*'
+        ],
+        'Métrica Principal': [
+            'R²: 0.7316', 
+            'R²: 0.9311', 
+            'R²: -0.6166', 
+            'R²: 0.9942', 
+            'R²: 0.9372'
+        ],
+        'Nota': [
+            'Sobreajustado', 
+            'Realista', 
+            'Requiere ajuste', 
+            'Sobreajustado', 
+            'Sobreajustado'
+        ]
     }
+
     st.dataframe(pd.DataFrame(metrics_data), use_container_width=True)
     st.warning("*Nota: Las métricas de Reg. Lineal, Prophet e Híbrido en el notebook original estaban sobreajustadas (evaluadas en datos de entrenamiento).")
 
