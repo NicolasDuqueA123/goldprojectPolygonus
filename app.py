@@ -85,7 +85,7 @@ with tab1:
     with col2:
         # Cargar una imagen (asegúrate de subir una imagen a tu repo y cambiar el nombre)
         st.image("gold.png", caption="El oro como activo financiero")
-        st.info("Asegúrate de añadir una imagen de oro a tu repositorio y descomentar la línea de st.image.")
+        st.info("El oro es considerado un activo refugio que preserva valor en el tiempo y se adelanta a crisis inflacionarias.")
 
 
 # --- PESTAÑA 2: GRÁFICAS Y ANÁLISIS ---
@@ -98,14 +98,18 @@ with tab2:
     st.plotly_chart(fig_hist, use_container_width=True)
     
     # Métricas (Copiadas de tu notebook)
+
+    # Métricas (Asegúrate de que todas las listas tengan la misma longitud)
     st.subheader("Métricas de Rendimiento (Evaluación del Notebook)")
     metrics_data = {
-        'Modelo': ['Regresión Lineal*', 'CNN 1D', 'ARIMA', 'Prophet*', 'Híbrido (P+CNN)*'],
-        'Métrica Principal': ['R²: 0.7316', 'R²: 0.9311', 'R²: -0.6166', 'R²: 0.9942', 'R²: 0.9372', 'Accuracy: (Ver gráfica)'],
-        'Nota': ['Sobreajustado', 'Realista', 'Requiere ajuste', 'Sobreajustado', 'Sobreajustado']
+        'Modelo': ['Regresión Lineal*', 'CNN 1D', 'ARIMA', 'Prophet*', 'Híbrido (P+CNN)*'], # 5 elementos
+        'Métrica Principal': ['R²: 0.7316', 'R²: 0.9311', 'R²: -0.6166', 'R²: 0.9942', 'R²: 0.9372'], # 5 elementos
+        'Nota': ['Sobreajustado', 'Realista', 'Requiere ajuste', 'Sobreajustado', 'Sobreajustado'] # 5 elementos
     }
     st.dataframe(pd.DataFrame(metrics_data), use_container_width=True)
     st.warning("*Nota: Las métricas de Reg. Lineal, Prophet e Híbrido en el notebook original estaban sobreajustadas (evaluadas en datos de entrenamiento).")
+
+
 
     # Gráfica del Modelo Logístico (Matriz de Confusión)
     #st.subheader("Análisis del Modelo Logístico (Predicción de Dirección)")
